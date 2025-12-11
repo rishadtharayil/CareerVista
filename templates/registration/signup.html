@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up - CareerVista{% endblock %}
+
+{% block content %}
+<section
+    style="max-width: 400px; margin: 60px auto; padding: 30px; border: 1px solid var(--border); border-radius: 16px; background: var(--bg-card);">
+    <h2 style="text-align: center; margin-bottom: 20px;">Create Account</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Sign Up</button>
+    </form>
+    <p style="text-align: center; margin-top: 15px; color: var(--text-muted);">
+        Already have an account? <a href="/login/" style="color: var(--primary);">Login</a>
+    </p>
+</section>
+{% endblock %}

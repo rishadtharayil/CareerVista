@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="hero">
+    <h1>Find Your Dream Career <br> Powered by AI</h1>
+    <p>Explore curated roadmaps, get personalized advice from Gemini, and track your progress.</p>
+    <a href="#careers" class="btn btn-primary">Explore Careers</a>
+    <a href="#" onclick="document.getElementById('chat-window').style.display='block'" class="btn btn-outline"
+        style="margin-left: 10px;">Chat with Coach</a>
+</section>
+
+<section id="careers" style="margin-top: 40px;">
+    <h2 style="margin-bottom: 20px;">Popular Careers</h2>
+    <div class="grid">
+        {% for career in featured_careers %}
+        <div class="card">
+            <h3 style="margin-bottom: 10px;">{{ career.title }}</h3>
+            <p style="color: var(--text-muted); margin-bottom: 15px;">{{ career.short_description|truncatewords:20 }}
+            </p>
+            <div style="margin-bottom: 15px;">
+                {% for tag in career.tags|slice:":3" %}
+                <span class="chip">{{ tag }}</span>
+                {% endfor %}
+            </div>
+            <a href="/careers/{{ career.slug }}/" class="btn btn-outline"
+                style="width: 100%; text-align: center; display: block;">View Roadmap</a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

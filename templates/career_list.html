@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Careers - CareerVista{% endblock %}
+
+{% block content %}
+<section style="padding: 40px 0;">
+    <h1>Explore Careers</h1>
+    <div style="margin-bottom: 20px;">
+        <input type="text" placeholder="Search careers..."
+            style="padding: 10px; width: 100%; max-width: 400px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-card); color: white;">
+    </div>
+    <div class="grid">
+        {% for career in careers %}
+        <div class="card">
+            <h3>{{ career.title }}</h3>
+            <p style="color: var(--text-muted); margin-bottom: 15px;">{{ career.short_description|truncatewords:20 }}
+            </p>
+            <div style="margin-bottom: 15px;">
+                {% for tag in career.tags|slice:":3" %}
+                <span class="chip">{{ tag }}</span>
+                {% endfor %}
+            </div>
+            <a href="/careers/{{ career.slug }}/" class="btn btn-outline"
+                style="width: 100%; text-align: center; display: block;">View Roadmap</a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

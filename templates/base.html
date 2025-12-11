@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CareerVista{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <!-- HTMX for interactivity -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <a href="/" class="logo">Career<span>Vista</span></a>
+            <div class="nav-links">
+                <a href="/careers/">Careers</a>
+                <a href="/roadmaps/">Roadmaps</a>
+                {% if user.is_authenticated %}
+                    <a href="/profile/">Profile</a>
+                    <a href="/logout/" class="btn btn-outline">Logout</a>
+                {% else %}
+                    <a href="/login/" class="btn btn-primary">Login</a>
+                {% endif %}
+            </div>
+        </nav>
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer style="margin-top: 50px; padding: 20px 0; border-top: 1px solid var(--border); color: var(--text-muted); text-align: center;">
+            <p>&copy; 2025 CareerVista. Informational purposes only.</p>
+        </footer>
+    </div>
+    
+    <!-- Chat Widget Placeholder -->
+    {% include 'chat/widget.html' %}
+</body>
+</html>

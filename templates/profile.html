@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - CareerVista{% endblock %}
+
+{% block content %}
+<section style="padding: 40px 0;">
+    <h1>Welcome, {{ user.username }}</h1>
+    <p style="color: var(--text-muted);">{{ user.email }}</p>
+
+    <div style="margin-top: 40px;">
+        <h2>My Learning Progress</h2>
+        {% if progress_list %}
+        <div class="grid">
+            {% for p in progress_list %}
+            <div class="card">
+                <h3>{{ p.roadmap_step.roadmap.career.title }}</h3>
+                <p style="font-weight: 500;">{{ p.roadmap_step.title }}</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                    <span class="chip" style="background: rgba(45, 212, 191, 0.1); color: var(--secondary);">{{
+                        p.get_status_display }}</span>
+                    <small class="text-muted">{{ p.updated_at|date:"M d, Y" }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="card" style="text-align: center; padding: 40px;">
+            <p>You haven't started any roadmaps yet.</p>
+            <a href="/careers/" class="btn btn-primary" style="margin-top: 20px; display: inline-block;">Explore
+                Careers</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

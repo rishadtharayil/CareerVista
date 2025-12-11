@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ career.title }} - CareerVista{% endblock %}
+
+{% block content %}
+<style>
+    .tab-nav {
+        display: flex;
+        gap: 20px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 20px;
+    }
+
+    .tab-btn {
+        background: none;
+        border: none;
+        padding: 10px 0;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 1rem;
+        border-bottom: 2px solid transparent;
+        transition: var(--transition);
+    }
+
+    .tab-btn.active {
+        color: var(--primary);
+        border-bottom-color: var(--primary);
+    }
+
+    .tab-content {
+        display: none;
+        animation: fadeIn 0.3s;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+</style>
+
+<section class="hero" style="text-align: left; padding: 40px 0;">
+    <h1>{{ career.title }}</h1>
+    <p>{{ career.short_description }}</p>
+    <div>
+        <button class="btn btn-primary" onclick="alert('Bookmark feature coming soon!')">Save Career</button>
+        <button class="btn btn-outline" onclick="document.getElementById('chat-window').style.display='block'">Ask AI
+            about this</button>
+    </div>
+</section>
+
+<div class="tab-nav">
+    <button class="tab-btn active" onclick="openTab(event, 'overview')">Overview</button>
+    <button class="tab-btn" onclick="openTab(event, 'roadmap')">Roadmap</button>
+    <button class="tab-btn" onclick="openTab(event, 'resources')">Resources</button>
+</div>
+
+<div id="overview" class="tab-content active">
+    <div class="card">
+        <h3>Description</h3>
+        <p>{{ career.long_description|linebreaks }}</p>
+
+        <h3 style="margin-top: 20px;">Day in the Life</h3>
+        <p>{{ career.day_in_life|linebreaks }}</p>
+
+        <h3 style="margin-top: 20px;">Key Skills</h3>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            {% for skill in career.skills %}
+            <span class="chip">{{ skill }}</span>
+            {% endfor %}
+        </div>
+
+        <h3 style="margin-top: 20px;">Compensation</h3>
+        <p>${{ career.salary_range_min }} - ${{ career.salary_range_max }} / year</p>
+        <p><small class="text-muted">Demand Level: {{ career.demand_note }}</small></p>
+    </div>
+</div>
+
+<div id="roadmap" class="tab-content">
+    {% for roadmap in career.roadmaps.all %}
+    <div class="card" style="margin-bottom: 20px;">
+        <h3>{{ roadmap.title }} <span style="font-size:0.8rem; color:var(--text-muted)">({{
+                roadmap.get_difficulty_level_display }})</span></h3>
+        <p>{{ roadmap.description }}</p>
+        <div style="margin-top: 20px; padding-left: 20px; border-left: 2px solid var(--border);">
+            {% for step in roadmap.steps.all %}
+            <div style="margin-bottom: 20px; position: relative;">
+                <div
+                    style="position: absolute; left: -26px; top: 0; width: 10px; height: 10px; background: var(--primary); border-radius: 50%;">
+                </div>
+                <h4>Step {{ step.order }}: {{ step.title }}</h4>
+                <p>{{ step.description }}</p>
+                <small style="color: var(--secondary);">Estimated time: {{ step.estimated_time }}</small>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% empty %}
+    <p>No roadmap available yet.</p>
+    {% endfor %}
+</div>
+
+<div id="resources" class="tab-content">
+    <div class="grid">
+        {% for res in career.resources.all %}
+        <div class="card">
+            <h4>{{ res.title }}</h4>
+            <span class="chip" style="font-size: 0.7rem;">{{ res.get_resource_type_display }}</span>
+            <p>{{ res.description }}</p>
+            <a href="{{ res.url }}" target="_blank"
+                style="color: var(--primary); display: inline-block; margin-top: 10px;">Visit Link &rarr;</a>
+        </div>
+        {% empty %}
+        <p>No resources listed.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    function openTab(evt, tabName) {
+        var i, tabContent, tabBtn;
+        tabContent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabContent.length; i++) {
+            tabContent[i].classList.remove("active");
+        }
+        tabBtn = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tabBtn.length; i++) {
+            tabBtn[i].classList.remove("active");
+        }
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
+</script>
+{% endblock %}

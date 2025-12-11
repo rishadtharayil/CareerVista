@@ -1,0 +1,11 @@
+Django>=5.0,<6.0
+djangorestframework
+psycopg2-binary
+python-dotenv
+google-generativeai
+markdown
+django-cors-headers
+drf-spectacular
+gunicorn
+whitenoise
+dj-database-url

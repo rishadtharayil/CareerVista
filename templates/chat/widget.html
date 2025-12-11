@@ -1,0 +1,125 @@
+<div id="chat-widget" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+    <!-- Simple floating button -->
+    <button class="btn btn-primary"
+        style="border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 24px;"
+        onclick="toggleChat()">
+        💬
+    </button>
+
+    <!-- Chat Window -->
+    <div id="chat-window"
+        style="display: none; position: absolute; bottom: 80px; right: 0; width: 350px; height: 500px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); flex-direction: column;">
+        <div
+            style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+            <h3 style="margin: 0;">AI Coach</h3>
+            <button onclick="toggleChat()"
+                style="background:none; border:none; color:var(--text-muted); cursor:pointer;">✕</button>
+        </div>
+        <div id="chat-messages"
+            style="flex: 1; overflow-y: auto; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px;">
+            <!-- Messages go here -->
+            <div
+                style="align-self: flex-start; background: var(--border); padding: 8px 12px; border-radius: 12px; max-width: 80%;">
+                Hello! I'm your career assistant. Ask me anything!
+            </div>
+        </div>
+        <form id="chat-form" onsubmit="sendMessage(event)" style="display: flex; gap: 5px;">
+            <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off"
+                style="flex: 1; padding: 10px; background: #000; border: 1px solid var(--border); color: white; border-radius: 8px;">
+            <button type="submit" class="btn btn-primary" style="padding: 0 15px;">&rarr;</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    let chatSessionId = localStorage.getItem('chatSessionId');
+    const chatWindow = document.getElementById('chat-window');
+
+    function toggleChat() {
+        chatWindow.style.display = chatWindow.style.display === 'none' ? 'flex' : 'none';
+        if (chatWindow.style.display === 'flex' && !chatSessionId) {
+            initSession();
+        }
+    }
+
+    async function initSession() {
+        try {
+            const res = await fetch('/api/chat/start/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            });
+            const data = await res.json();
+            chatSessionId = data.session_id;
+            localStorage.setItem('chatSessionId', chatSessionId);
+        } catch (e) {
+            console.error("Failed to start chat session", e);
+        }
+    }
+
+    async function sendMessage(e) {
+        e.preventDefault();
+        const input = document.getElementById('chat-input');
+        const text = input.value.trim();
+        if (!text) return;
+
+        appendMessage('user', text);
+        input.value = '';
+
+        if (!chatSessionId) await initSession();
+
+        try {
+            const res = await fetch(`/api/chat/${chatSessionId}/message/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ message: text })
+            });
+            const data = await res.json();
+            appendMessage('assistant', data.response);
+        } catch (e) {
+            appendMessage('assistant', "Sorry, I encountered an error.");
+        }
+    }
+
+    function appendMessage(role, text) {
+        const msgs = document.getElementById('chat-messages');
+        const div = document.createElement('div');
+        div.style.padding = '8px 12px';
+        div.style.borderRadius = '12px';
+        div.style.maxWidth = '80%';
+        div.style.wordWrap = 'break-word';
+
+        if (role === 'user') {
+            div.style.alignSelf = 'flex-end';
+            div.style.background = 'var(--primary)';
+            div.style.color = 'white';
+        } else {
+            div.style.alignSelf = 'flex-start';
+            div.style.background = 'var(--border)';
+            div.style.color = 'var(--text-main)';
+        }
+        div.innerText = text;
+        msgs.appendChild(div);
+        msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
